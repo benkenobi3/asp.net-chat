@@ -34,7 +34,16 @@ namespace asp.net_chat
                 options.MaximumReceiveMessageSize = 4096;
                 options.StreamBufferCapacity = 4096;
             });
-            services.AddCors();
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .WithOrigins("http://localhost:8080")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                    );
+            });
             services.AddMvc(options => options.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Latest).AddNewtonsoftJson();
             services.AddMemoryCache();
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -51,13 +60,7 @@ namespace asp.net_chat
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder =>
-                builder
-                    .WithOrigins("http://localhost:8080")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials()
-            );
+            app.UseCors("CorsPolicy");
 
             app.UseHttpsRedirection();
 

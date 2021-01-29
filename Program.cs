@@ -20,6 +20,6 @@ namespace asp.net_chat
         public static IWebHostBuilder CreateHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:5100");
+                .UseUrls("http://0.0.0.0:5100");
     }
 }
