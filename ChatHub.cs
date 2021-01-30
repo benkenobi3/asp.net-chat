@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using asp.net_chat.DataModel;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace asp.net_chat
 {
@@ -17,11 +18,12 @@ namespace asp.net_chat
             Console.WriteLine("New Connection Started: " + Context.ConnectionId);
             Clients.All.SendAsync("NewConnection", "New Connection Successfull", Context.ConnectionId);
             return base.OnConnectedAsync();
+            
         }
 
         public override Task OnDisconnectedAsync(System.Exception exception)
         {
-            db.Database.ExecuteSqlRaw("TRUNCATE TABLE public.message");
+            db.Database.ExecuteSqlRaw("TRUNCATE TABLE public.\"Message\"");
             
             Console.WriteLine("Discconnected: " + Context.ConnectionId);
             Clients.All.SendAsync("DisconnectConnection", "Connection Destoryed", Context.ConnectionId);
@@ -43,6 +45,28 @@ namespace asp.net_chat
         {
             Console.WriteLine("User Joined");
             await Clients.All.SendAsync("JoinRoom", name);
+        }
+
+        public async Task FetchMessages()
+        {
+            Console.WriteLine(Clients.ToString());
+            
+            var messages = db.Message.ToList();
+            
+            var JSONmessages = new List<string>();
+
+            foreach (var msg in messages)
+            {
+                JSONmessages.Add(msg.jsonString());
+            }
+            
+            Console.WriteLine("Fetch Messages");
+            await Clients.Caller.SendAsync("FetchMessages", JsonSerializer.Serialize(JSONmessages));
+        }
+
+        public async Task FetchOnline()
+        {
+            await Clients.Caller.SendAsync("FetchCount", Clients.ToString());
         }
     }
 }

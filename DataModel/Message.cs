@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json.Linq;
 
@@ -23,11 +24,10 @@ namespace asp.net_chat.DataModel
         public long Timestamp { get; set; }
         public string Username { get; set; }
         public string Text { get; set; }
-        
-        public override string ToString()
+
+        public string jsonString()
         {
-            return Id.ToString();
+            return "{\"username\": \"" + this.Username + "\", \"timestamp\": " + this.Timestamp + ", \"message\": \"" + this.Text + "\"}";
         }
-        
     }
 }
